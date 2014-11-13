@@ -42,6 +42,9 @@ public class GUI extends javax.swing.JFrame {
 		jButton1 = new javax.swing.JButton();
 		jComboBox1 = new javax.swing.JComboBox<String>();
 		jComboBox2 = new javax.swing.JComboBox<String>();
+		jComboBox3 = new javax.swing.JComboBox();
+		jComboBox4 = new javax.swing.JComboBox();
+		jComboBox5 = new javax.swing.JComboBox();
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		listModel = new DefaultListModel<String>();
@@ -68,10 +71,13 @@ public class GUI extends javax.swing.JFrame {
 
 		jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(stops
 				.toArray()));
-		stops.add("NULL");
+		stops.set(0, "Select end route");
 
 		jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(stops
 				.toArray()));
+		jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(days));
+		jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(times));
+		jComboBox5.setModel(new javax.swing.DefaultComboBoxModel(new String[] {"A.M", "P.M"}));
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
 				getContentPane());
@@ -81,29 +87,51 @@ public class GUI extends javax.swing.JFrame {
 				.addGroup(
 						javax.swing.GroupLayout.Alignment.TRAILING,
 						layout.createSequentialGroup()
-								.addContainerGap(80, Short.MAX_VALUE)
+								.addContainerGap(
+										javax.swing.GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE)
 								.addGroup(
 										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.TRAILING,
+												javax.swing.GroupLayout.Alignment.LEADING,
 												false)
 												.addComponent(
 														jButton1,
+														javax.swing.GroupLayout.Alignment.TRAILING,
 														javax.swing.GroupLayout.DEFAULT_SIZE,
 														310, Short.MAX_VALUE)
-												.addComponent(
-														jScrollPane1,
-														javax.swing.GroupLayout.Alignment.LEADING)
+												.addComponent(jScrollPane1)
 												.addComponent(
 														jComboBox1,
-														javax.swing.GroupLayout.Alignment.LEADING,
 														0,
 														javax.swing.GroupLayout.DEFAULT_SIZE,
 														Short.MAX_VALUE)
 												.addComponent(
 														jComboBox2,
+														javax.swing.GroupLayout.Alignment.TRAILING,
 														0,
 														javax.swing.GroupLayout.DEFAULT_SIZE,
-														Short.MAX_VALUE))
+														Short.MAX_VALUE)
+												.addGroup(
+														layout.createSequentialGroup()
+																.addComponent(
+																		jComboBox3,
+																		javax.swing.GroupLayout.PREFERRED_SIZE,
+																		154,
+																		javax.swing.GroupLayout.PREFERRED_SIZE)
+																.addPreferredGap(
+																		javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+																.addComponent(
+																		jComboBox4,
+																		javax.swing.GroupLayout.PREFERRED_SIZE,
+																		75,
+																		javax.swing.GroupLayout.PREFERRED_SIZE)
+																.addPreferredGap(
+																		javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+																.addComponent(
+																		jComboBox5,
+																		0,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		Short.MAX_VALUE)))
 								.addContainerGap()));
 		layout.setVerticalGroup(layout
 				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,7 +151,27 @@ public class GUI extends javax.swing.JFrame {
 										javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(
 										javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-										37, Short.MAX_VALUE)
+										14, Short.MAX_VALUE)
+								.addGroup(
+										layout.createParallelGroup(
+												javax.swing.GroupLayout.Alignment.BASELINE)
+												.addComponent(
+														jComboBox3,
+														javax.swing.GroupLayout.PREFERRED_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.PREFERRED_SIZE)
+												.addComponent(
+														jComboBox4,
+														javax.swing.GroupLayout.PREFERRED_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.PREFERRED_SIZE)
+												.addComponent(
+														jComboBox5,
+														javax.swing.GroupLayout.PREFERRED_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(
+										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addComponent(jButton1,
 										javax.swing.GroupLayout.PREFERRED_SIZE,
 										23,
@@ -146,12 +194,11 @@ public class GUI extends javax.swing.JFrame {
 					.executeQuery("Select StopName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND RouteName = \""
 							+ routeName + "\"");
 			String routeStops = "Stops:\n";
-			while (rs.next()){
+			while (rs.next()) {
 				routeStops = routeStops + (rs.getString("StopName")) + "\n";
 			}
-			JOptionPane.showMessageDialog(this.getContentPane(),
-				    routeStops,
-				    "Showing info for " + routeName, JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(this.getContentPane(), routeStops,
+					"Showing info for " + routeName, JOptionPane.PLAIN_MESSAGE);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -159,8 +206,14 @@ public class GUI extends javax.swing.JFrame {
 
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
 		listModel.clear();
+		if (((String) jComboBox1.getSelectedItem()).contains("Select")) {
+			JOptionPane.showMessageDialog(this.getContentPane(),
+					"Please select a starting route!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
-		if (((String) jComboBox2.getSelectedItem()).contains("NULL")) {
+		if (((String) jComboBox2.getSelectedItem()).contains("Select")) {
 			ResultSet rs;
 			try {
 				System.out.println(jComboBox1.getSelectedItem());
@@ -213,6 +266,7 @@ public class GUI extends javax.swing.JFrame {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet rs = statement.executeQuery("Select * FROM Bus_Stop");
+			stops.add("Select starting route");
 			while (rs.next()) {
 				stops.add(rs.getString("StopName"));
 			}
@@ -255,6 +309,9 @@ public class GUI extends javax.swing.JFrame {
 		});
 	}
 
+	private String[] days = {"Sunday", "Monday", "Tuesday",
+			"Wednesday", "Thursday", "Friday", "Saturday" };
+	private String[] times = { "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" };
 	private static DefaultListModel<String> listModel;
 	private static ArrayList<String> stops;
 	private static Statement statement;
@@ -262,7 +319,10 @@ public class GUI extends javax.swing.JFrame {
 	private javax.swing.JButton jButton1;
 	private javax.swing.JComboBox<String> jComboBox1;
 	private javax.swing.JComboBox<String> jComboBox2;
+	private javax.swing.JComboBox jComboBox3;
+	private javax.swing.JComboBox jComboBox4;
+	private javax.swing.JComboBox jComboBox5;
 	private javax.swing.JList<String> jList1;
 	private javax.swing.JScrollPane jScrollPane1;
-	
+
 }
