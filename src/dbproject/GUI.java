@@ -6,10 +6,13 @@ package dbproject;
  * and open the template in the editor.
  */
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 /**
@@ -45,18 +48,24 @@ public class GUI extends javax.swing.JFrame {
 		jList1.setModel(listModel);
 		jScrollPane1.setViewportView(jList1);
 
-		jButton1.setText("jButton1");
+		jButton1.setText("View routes");
 		jButton1.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jButton1ActionPerformed(evt);
 			}
 		});
 
-		jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jComboBox1ActionPerformed(evt);
+		jList1.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent evt) {
+				JList list = (JList) evt.getSource();
+				if (evt.getClickCount() == 2) {
+					int index = list.locationToIndex(evt.getPoint());
+
+					jList1ActionPerformed(evt, index);
+				}
 			}
 		});
+
 		jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(stops
 				.toArray()));
 		stops.add("NULL");
@@ -130,8 +139,27 @@ public class GUI extends javax.swing.JFrame {
 		pack();
 	}// </editor-fold>
 
+	private void jList1ActionPerformed(java.awt.event.MouseEvent evt, int index) {
+		String routeName = listModel.get(index);
+		try {
+			ResultSet rs = statement
+					.executeQuery("Select StopName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND RouteName = \""
+							+ routeName + "\"");
+			String routeStops = "Stops:\n";
+			while (rs.next()){
+				routeStops = routeStops + (rs.getString("StopName")) + "\n";
+			}
+			JOptionPane.showMessageDialog(this.getContentPane(),
+				    routeStops,
+				    "Showing info for " + routeName, JOptionPane.PLAIN_MESSAGE);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
 		listModel.clear();
+
 		if (((String) jComboBox2.getSelectedItem()).contains("NULL")) {
 			ResultSet rs;
 			try {
@@ -144,14 +172,28 @@ public class GUI extends javax.swing.JFrame {
 					listModel.addElement(rs.getString("RouteName"));
 				}
 			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		else {
+			ResultSet rs;
+			try {
+				System.out.println(jComboBox1.getSelectedItem());
+				rs = statement
+						.executeQuery("Select distinct RouteName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND  StopName = \""
+								+ jComboBox1.getSelectedItem()
+								+ "\" AND RouteName IN (Select distinct RouteName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND  StopName = \""
+								+ jComboBox2.getSelectedItem() + "\")");
+
+				while (rs.next()) {
+					listModel.addElement(rs.getString("RouteName"));
+				}
+			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {
-		// TODO add your handling code here:
 	}
 
 	/**
@@ -217,11 +259,10 @@ public class GUI extends javax.swing.JFrame {
 	private static ArrayList<String> stops;
 	private static Statement statement;
 	private static Connection connection;
-	// Variables declaration - do not modify
 	private javax.swing.JButton jButton1;
 	private javax.swing.JComboBox<String> jComboBox1;
 	private javax.swing.JComboBox<String> jComboBox2;
 	private javax.swing.JList<String> jList1;
 	private javax.swing.JScrollPane jScrollPane1;
-	// End of variables declaration
+	
 }
