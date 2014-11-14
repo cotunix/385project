@@ -1,0 +1,21 @@
+* Get routes that service stop1 and stop2 and given day and time *
+
+Select distinct RouteName, Route_ID from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND  StopName = “(Stop 1)” AND RouteName IN (Select distinct RouteName from BUS_STOP, ROUTE_STOPS, ROUTE, ROUTE_TIME WHERE StopID = Stop_ID AND Route_ID = RouteID AND Time_ID = TimeID AND (day) BETWEEN StartDay AND EndDay AND "(time) BETWEEN StartTime and EndTime AND StopName = "(stop 2)” ;
+
+* Get all stops along user entered route *
+
+Select StopName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND RouteName = "routeName";
+
+* Get all stop names to populate drop down list *
+
+Select StopName FROM Bus_Stop;
+
+* Count stops in a route *
+
+Select Count(*) from ROUTE_STOPS, ROUTE where Route_ID = RouteID AND RouteName = '(user routename)';
+
+* Admin: Enter new bus (Admins can alter or insert into any table, bus used as example) *
+
+INSERT INTO BUS VALUES(5, 'U2', :10);
+
+
