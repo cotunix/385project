@@ -1,5 +1,7 @@
 Running code:
-Instructions for running as eclipse project:
+Instructions for running as eclipse project(provided entire project file):
+
+(I suggest you simply import the ZIP file as a new project in eclipse for ease)
 
 First off, make sure that jdbc jar is in the build path of the project and that the database file is in the same directory as the source code. After you have the program running, navigating the interface is fairly easy.
 The first drop down box is the bus stop that you wish to get on the bus. The second drop down box is which stop you wish to get off. If you only want to know buses that pick up a certain stop, you can leave

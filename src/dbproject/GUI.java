@@ -22,15 +22,16 @@ public class GUI extends javax.swing.JFrame {
 	private void initComponents() {
 
 		jScrollPane1 = new javax.swing.JScrollPane();
-		jList1 = new javax.swing.JList<String>();
+		jList1 = new javax.swing.JList();
 		jButton1 = new javax.swing.JButton();
-		jButton2 = new javax.swing.JButton();
-		jComboBox1 = new javax.swing.JComboBox<String>();
-		jComboBox2 = new javax.swing.JComboBox<String>();
-		jComboBox3 = new javax.swing.JComboBox<String>();
-		jComboBox4 = new javax.swing.JComboBox<String>();
-		jComboBox5 = new javax.swing.JComboBox<String>();
+		jComboBox1 = new javax.swing.JComboBox();
+		jComboBox3 = new javax.swing.JComboBox();
+		jComboBox2 = new javax.swing.JComboBox();
+		jComboBox4 = new javax.swing.JComboBox();
+		jComboBox5 = new javax.swing.JComboBox();
 		label1 = new java.awt.Label();
+		
+		jButton3 = new javax.swing.JButton();
 
 		label1.setText("Routes:");
 
@@ -47,7 +48,8 @@ public class GUI extends javax.swing.JFrame {
 				jButton1ActionPerformed(evt);
 			}
 		});
-		jButton2.setText("Admin Login");
+	
+		jButton3.setText("+");
 
 		jList1.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
@@ -131,10 +133,13 @@ public class GUI extends javax.swing.JFrame {
 																		javax.swing.LayoutStyle.ComponentPlacement.RELATED,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		Short.MAX_VALUE)
+																
+																.addPreferredGap(
+																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																.addComponent(
-																		jButton2,
+																		jButton3,
 																		javax.swing.GroupLayout.PREFERRED_SIZE,
-																		103,
+																		30,
 																		javax.swing.GroupLayout.PREFERRED_SIZE)))
 								.addContainerGap()));
 		layout.setVerticalGroup(layout
@@ -181,8 +186,7 @@ public class GUI extends javax.swing.JFrame {
 										javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(
 										javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-										javax.swing.GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)
+										11, Short.MAX_VALUE)
 								.addGroup(
 										layout.createParallelGroup(
 												javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,9 +196,13 @@ public class GUI extends javax.swing.JFrame {
 														javax.swing.GroupLayout.PREFERRED_SIZE,
 														javax.swing.GroupLayout.DEFAULT_SIZE,
 														javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(
-														jButton2,
-														javax.swing.GroupLayout.Alignment.TRAILING))
+												.addGroup(
+														javax.swing.GroupLayout.Alignment.TRAILING,
+														layout.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+																
+																.addComponent(
+																		jButton3)))
 								.addPreferredGap(
 										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addComponent(jScrollPane1,
@@ -209,13 +217,15 @@ public class GUI extends javax.swing.JFrame {
 	private void jList1ActionPerformed(java.awt.event.MouseEvent evt, int index) {
 		String routeName = (listModel.get(index).split(":"))[0];
 		try {
-			pStatement = connection.prepareStatement("Select Count(*) from ROUTE_STOPS, ROUTE where Route_ID = RouteID AND RouteName = '" + routeName + "'");
+			pStatement = connection
+					.prepareStatement("Select Count(*) from ROUTE_STOPS, ROUTE where Route_ID = RouteID AND RouteName = '"
+							+ routeName + "'");
 			ResultSet rs1 = pStatement.executeQuery();
 			ResultSet rs2 = statement
 					.executeQuery("Select StopName from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND RouteName = \""
 							+ routeName + "\"");
 			rs1.next();
-			String routeStops = rs1.getInt(1)+ " Stops:\n";
+			String routeStops = rs1.getInt(1) + " Stops:\n";
 			while (rs2.next()) {
 				routeStops = routeStops + (rs2.getString("StopName")) + "\n";
 			}
@@ -228,7 +238,7 @@ public class GUI extends javax.swing.JFrame {
 
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
 		listModel.clear();
-	
+
 		if (((String) jComboBox1.getSelectedItem()).contains("Select")) {
 			JOptionPane.showMessageDialog(this.getContentPane(),
 					"Please select a starting route!", "Error",
@@ -264,7 +274,7 @@ public class GUI extends javax.swing.JFrame {
 
 			try {
 
-				rs= statement
+				rs = statement
 						.executeQuery("Select distinct RouteName, Route_ID from BUS_STOP, ROUTE_STOPS, ROUTE WHERE StopID = Stop_ID AND Route_ID = RouteID AND  StopName = \""
 								+ jComboBox1.getSelectedItem()
 								+ "\" AND RouteName IN (Select distinct RouteName from BUS_STOP, ROUTE_STOPS, ROUTE, ROUTE_TIME WHERE StopID = Stop_ID AND Route_ID = RouteID AND Time_ID = TimeID AND "
@@ -273,8 +283,6 @@ public class GUI extends javax.swing.JFrame {
 								+ time
 								+ " BETWEEN StartTime and EndTime AND StopName = \""
 								+ jComboBox2.getSelectedItem() + "\")");
-				 
-						 
 
 				while (rs.next()) {
 					listModel.addElement(rs.getString("RouteName") + ":       "
@@ -301,7 +309,8 @@ public class GUI extends javax.swing.JFrame {
 					.getConnection("jdbc:sqlite:src/dbproject/bcrta.db");
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rs = statement.executeQuery("Select StopName FROM Bus_Stop");
+			ResultSet rs = statement
+					.executeQuery("Select StopName FROM Bus_Stop");
 			stops.add("Select starting route");
 			while (rs.next()) {
 				stops.add(rs.getString("StopName"));
@@ -355,7 +364,8 @@ public class GUI extends javax.swing.JFrame {
 	private static PreparedStatement pStatement;
 	private static Connection connection;
 	private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+	
+	private javax.swing.JButton jButton3;
 	private javax.swing.JComboBox<String> jComboBox1;
 	private javax.swing.JComboBox<String> jComboBox2;
 	private javax.swing.JComboBox<String> jComboBox3;
